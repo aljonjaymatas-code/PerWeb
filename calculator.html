@@ -34,8 +34,12 @@
       <button onclick="appendValue('+')">+</button>
       <button class="equal" onclick="calculate()">=</button>
       
-      <button class="clear" onclick="clearDisplay()" style="grid-column: span 4;">Clear</button>
+      <!-- Clear and Delete side by side -->
+      <button class="clear" onclick="clearDisplay()" style="grid-column: span 2;">Clear</button>
+      <button class="delete" onclick="deleteLast()" style="grid-column: span 2;">Delete</button>
 
+      <!-- Logout button under Clear/Delete -->
+      <button class="logout" onclick="logout()" style="grid-column: span 4;">Logout</button>
     </div>
   </div>
 
