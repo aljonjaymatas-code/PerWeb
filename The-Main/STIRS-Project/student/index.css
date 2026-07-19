@@ -32,7 +32,7 @@ body {
 /* LEFT SIDE (MATCH LOGIN DESIGN) */
 .left {
     width: 50%;
-    background: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b') no-repeat center/cover;
+    background: url('../../pictures/room.jpg') center/cover no-repeat;
     position: relative;
     color: white;
 }

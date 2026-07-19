@@ -93,3 +93,24 @@ window.addEventListener("scroll", function () {
     navbar.classList.remove("scrolled");
   }
 });
+
+document.getElementById('project').addEventListener('click', function(event) {
+    // Prevent the default immediate link jump
+    event.preventDefault(); 
+    
+    // Display a confirmation dialog asking the user where they want to go
+    // Clicking "OK" goes to Admin, clicking "Cancel" goes to Student
+    const choice = confirm("Where would you like to go?\n\nClick 'OK' for Student Portal.\nClick 'Cancel' for Admin Portal.");
+    
+    if (choice) {
+        // User clicked OK -> Redirect to Admin side
+        alert("Redirecting to Student Portal...");
+        window.location.href = "The-Main/STIRS-Project/student/index.html"; // Update this path if your admin folder name is different
+    } else {
+        // User clicked Cancel -> Redirect to Student side
+        alert("Redirecting to Admin Portal...");
+        window.location.href = "The-Main/STIRS-Project/admin/adminLogin.html";
+    }
+});
+
+//The-Main/STIRS-Project/student/index.html
