@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aces Polytechnic - Request Status</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="request.css">
+</head>
+<body>
+
+<div class="track-container">
+    <div class="track-box">
+        <div class="header">
+            <img src="photo/acespicture-modified (1).png" class="logo" alt="Logo">
+            <h1>Request Status</h1>
+            <p>Review your submitted Student ID request details below.</p>
+        </div>
+
+        <div id="statusContent">
+            <div class="status-card">
+                <div id="statusIcon" class="status-icon"></div>
+                <div class="status-details">
+                    <p><strong>Name:</strong> <span id="displayName"></span></p>
+                    <p><strong>Tracking Number:</strong> <span id="displayTracking"></span></p>
+                    <p><strong>Student ID:</strong> <span id="displayStudentId"></span></p>
+                    <p><strong>Status:</strong> <span id="statusText" class="status-text"></span></p>
+                    <p><strong>Date Submitted:</strong> <span id="submitDate"></span></p>
+                    <p id="adminComment"></p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="request.html" class="track-btn">
+                    <i class="fas fa-search"></i> Check Another Request
+                </a>
+                <a href="../../index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        <div id="emptyMessage" style="display:none; text-align:center; padding: 20px;">
+            <div style="font-size: 48px; color: #ffc107; margin-bottom: 20px;"><i class="fas fa-exclamation-circle"></i></div>
+            <h2>No saved request found</h2>
+            <p>Please submit a new ID request first.</p>
+            <a href="requestForm.html" class="track-btn">
+                <i class="fas fa-paper-plane"></i> Submit Request
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const savedRequest = JSON.parse(localStorage.getItem('currentRequestCheck') || 'null') || JSON.parse(localStorage.getItem('lastIdRequest') || 'null');
+
+    if (!savedRequest) {
+        document.getElementById('statusContent').style.display = 'none';
+        document.getElementById('emptyMessage').style.display = 'block';
+    } else {
+        const status = (savedRequest.status || 'Pending');
+        document.getElementById('displayName').textContent = savedRequest.fullName || 'N/A';
+        document.getElementById('displayTracking').textContent = savedRequest.trackingNumber || 'N/A';
+        document.getElementById('displayStudentId').textContent = savedRequest.studentId || 'N/A';
+        document.getElementById('submitDate').textContent = savedRequest.submittedAt || new Date().toLocaleDateString();
+        document.getElementById('statusText').textContent = status;
+
+        if (status === 'Approved') {
+            document.getElementById('statusText').style.color = '#28a745';
+            document.getElementById('adminComment').innerHTML = '<i class="fas fa-info-circle"></i> Your request is approved. Continue to track or submit a new request.';
+            document.getElementById('adminComment').style.color = '#28a745';
+            document.getElementById('statusIcon').innerHTML = '<i class="fas fa-check-circle" style="color:#28a745; font-size:50px;"></i>';
+        } else if (status === 'Rejected') {
+            document.getElementById('statusText').style.color = '#dc3545';
+            document.getElementById('statusIcon').innerHTML = '<i class="fas fa-times-circle" style="color:#dc3545; font-size:50px;"></i>';
+            
+            const reason = savedRequest.adminComment || 'No specific reason provided.';
+            document.getElementById('adminComment').innerHTML = `
+                <span style="display:block; margin-top:6px; padding:12px 14px; background:#fff5f5; border-left:4px solid #dc3545; border-radius:6px;">
+                    <strong style="color:#dc3545;"><i class="fas fa-exclamation-circle"></i> Rejection Reason:</strong><br>
+                    <span style="color:#555; margin-top:4px; display:block;">${reason}</span>
+                </span>
+                <span style="display:block; margin-top:10px; color:#dc3545; font-size:14px;">Please contact the office for further assistance.</span>
+            `;
+        } else {
+            document.getElementById('statusText').style.color = '#ffc107';
+            document.getElementById('adminComment').innerHTML = '<i class="fas fa-info-circle"></i> Your request is pending approval from the admin.';
+            document.getElementById('adminComment').style.color = '#888';
+            document.getElementById('statusIcon').innerHTML = '<i class="fas fa-clock" style="color:#ffc107; font-size:50px;"></i>';
+        }
+    }
+</script>
+
+</body>
+</html>

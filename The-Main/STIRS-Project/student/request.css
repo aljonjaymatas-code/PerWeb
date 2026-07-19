@@ -1,0 +1,160 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.track-container {
+    width: 100%;
+    max-width: 520px;
+}
+
+.track-box {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    padding: 40px 35px;
+    text-align: center;
+}
+
+.logo {
+    height: 60px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #2E7D32;
+    margin-bottom: 8px;
+}
+
+p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #2E7D32;
+}
+
+.track-btn {
+    width: 100%;
+    padding: 14px;
+    background: #2E7D32;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.track-btn:hover {
+    background: #1e5c24;
+}
+
+.result-area {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.status-card {
+    background: #f9f9f9;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.status-details p {
+    margin: 8px 0;
+}
+
+.new-search-btn {
+    width: 100%;
+    padding: 12px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.footer-link {
+    
+    margin-top: 18px;
+    font-size: 16px;
+}
+
+.footer-link a {
+    
+    color: #2E7D32;
+    text-decoration: none;
+}
+
+.footer-link a:hover {
+    text-decoration: underline;
+}
+.footer-link p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 18px;
+}
+
+.required {
+    color: #ff3333;
+    font-weight: bold;
+    margin-left: 3px;
+}
+
+.track-box a {
+    display: inline-block;
+    margin-top: 5px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-btn {
+    padding: 14px;
+    color: #2E7D32;
+    text-decoration: none;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap:10px; 
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+}
+

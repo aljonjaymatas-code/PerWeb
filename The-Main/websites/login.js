@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const form = document.getElementById("loginForm");
 const errorMsg = document.getElementById("errorMsg");
 const togglePassword = document.getElementById("togglePassword");
@@ -50,7 +50,7 @@ function logout() {
   window.location.href = "index.html";
 }
 
-=======
+
 const form = document.getElementById("loginForm");
 const errorMsg = document.getElementById("errorMsg");
 const togglePassword = document.getElementById("togglePassword");
@@ -82,4 +82,4 @@ form.addEventListener("submit", function(event) {
     alert("Login successful (Password meets LUDS-8)!");
   }
 });
->>>>>>> 9e60f0b4bf0971d665fc2421d8dcce02fd3598c4
+

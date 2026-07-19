@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STIRS – Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green:      #1B5E20;
+            --green-mid:  #2E7D32;
+            --green-lt:   #4CAF50;
+            --cream:      #F8F6F0;
+            --gold:       #C9A84C;
+            --dark:       #1A1A1A;
+            --text:       #3D3D3D;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .shell {
+            display: flex;
+            width: min(1160px, 97vw);
+            height: min(680px, 96vh);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.22);
+        }
+
+        /* LEFT */
+        .left {
+            flex: 1;
+            background: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=900&q=80') center/cover no-repeat;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 50px;
+        }
+        .left::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(27,94,32,0.55) 0%, rgba(0,0,0,0.75) 100%);
+        }
+        .left-content { position: relative; z-index: 1; color: white; }
+        .badge {
+            display: inline-block;
+            background: var(--gold);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 18px;
+        }
+        .left h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(32px, 4vw, 52px);
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .left p { font-size: 15px; opacity: 0.85; max-width: 300px; line-height: 1.6; margin-bottom: 30px; }
+        .left-footer { display: flex; gap: 18px; }
+        .left-footer a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.2s; }
+        .left-footer a:hover { color: white; }
+
+        /* RIGHT */
+        .right {
+            width: 420px;
+            flex-shrink: 0;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 44px;
+        }
+        .logo-wrap { margin-bottom: 8px; }
+        .logo-wrap img { height: 70px; }
+        .right h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--green);
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .right .tagline { font-size: 13px; color: #888; text-align: center; margin-bottom: 36px; }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--green-mid);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15.5px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 20px rgba(46,125,50,0.25);
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-primary:hover { background: var(--green); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(46,125,50,0.35); }
+
+        .btn-secondary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px 20px;
+            background: transparent;
+            color: var(--green-mid);
+            border: 2px solid var(--green-mid);
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s;
+            margin-bottom: 28px;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-secondary:hover { background: #f0f9f0; }
+
+        .disclaimer {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 12px;
+            color: #92400e;
+            text-align: center;
+            line-height: 1.5;
+        }
+        .disclaimer i { margin-right: 5px; }
+
+        @media (max-width: 720px) {
+            .shell { flex-direction: column; border-radius: 0; height: 100vh; width: 100vw; }
+            .left { height: 230px; padding: 30px; flex-shrink: 0; }
+            .right { width: 100%; flex: 1; padding: 30px 24px; }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <div class="left">
+        <div class="left-content">
+            <span class="badge">ACES Polytechnic</span>
+            <h1>Student ID<br>Request<br>System</h1>
+            <p>Submit and track your student ID request quickly and securely.</p>
+        </div>
+    </div>
+
+    <div class="right">
+        <div class="logo-wrap">
+            <img src="photo/acespicture-modified (1).png" alt="Logo" onerror="this.style.display='none'">
+        </div>
+        <h2>ACES Polytechnic College Inc.</h2>
+        <p class="tagline">Access student or admin system</p>
+
+        <a href="requestForm.html" class="btn-primary">
+            <i class="fas fa-id-card"></i> Request a Student ID
+        </a>
+        <a href="request.html" class="btn-secondary">
+            <i class="fas fa-search"></i> Track My Request
+        </a>
+
+        <div class="disclaimer">
+            <i class="fas fa-info-circle"></i>
+            This system is developed for academic purposes. All data is for demonstration only.
+        </div>
+    </div>
+</div>
+</body>
+</html>

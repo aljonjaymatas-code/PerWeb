@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 .sidebar {
       background: #000;
       width: 240px;
@@ -50,7 +50,7 @@
     }
     .chat-input button {
       border-radius: 0 20px 20px 0;
-=======
+    }
 .sidebar {
       background: #000;
       width: 240px;
@@ -102,5 +102,4 @@
     }
     .chat-input button {
       border-radius: 0 20px 20px 0;
->>>>>>> 9e60f0b4bf0971d665fc2421d8dcce02fd3598c4
     }

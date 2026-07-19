@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 :root {
   --bg:#0f1724; --card:#0b1220; --muted:#94a3b8; --accent:#7c3aed; --success:#10b981;
   --glass: rgba(255,255,255,0.03);
@@ -140,7 +140,7 @@ li.item.done .text { opacity: 0.6; text-decoration: line-through; color: var(--m
   font-size: 15px;
 }
 
-=======
+
 :root {
   --bg:#0f1724; --card:#0b1220; --muted:#94a3b8; --accent:#7c3aed; --success:#10b981;
   --glass: rgba(255,255,255,0.03);
@@ -282,4 +282,4 @@ li.item.done .text { opacity: 0.6; text-decoration: line-through; color: var(--m
   font-size: 15px;
 }
 
->>>>>>> 9e60f0b4bf0971d665fc2421d8dcce02fd3598c4
+

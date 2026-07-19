@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const SELECTORS = {
   newTask: document.getElementById('newTask'),
   addBtn: document.getElementById('addBtn'),
@@ -161,7 +161,7 @@ SELECTORS.clearCompleted.addEventListener('click', () => {
 // initialize
 load()
 render()
-=======
+
 const SELECTORS = {
   newTask: document.getElementById('newTask'),
   addBtn: document.getElementById('addBtn'),
@@ -324,4 +324,4 @@ SELECTORS.clearCompleted.addEventListener('click', () => {
 // initialize
 load()
 render()
->>>>>>> 9e60f0b4bf0971d665fc2421d8dcce02fd3598c4
+

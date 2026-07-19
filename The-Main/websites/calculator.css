@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 body {
   font-family: Arial, sans-serif;
   background: #001f3f; /* same background as login */
@@ -102,7 +102,7 @@ button:hover {
 .logout:hover {
   background: #b71c1c;
 }
-=======
+
 body {
   font-family: Arial, sans-serif;
   background: #001f3f; /* same background as login */
@@ -206,4 +206,4 @@ button:hover {
 .logout:hover {
   background: #b71c1c;
 }
->>>>>>> 9e60f0b4bf0971d665fc2421d8dcce02fd3598c4
+

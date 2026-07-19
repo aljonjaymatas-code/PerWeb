@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STIRS – Submit ID Request</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --green: #1B5E20; --mid: #2E7D32; --lt: #E8F5E9; --gold: #C9A84C; --err: #D32F2F; }
+        body { font-family: 'DM Sans', sans-serif; background: #f0f4f8; min-height: 100vh; padding: 24px 16px; }
+
+        /* LAYOUT */
+        .page-wrap { max-width: 820px; margin: 0 auto; }
+
+        /* HEADER BAR */
+        .top-bar {
+            background: var(--green);
+            border-radius: 16px 16px 0 0;
+            padding: 18px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .top-bar .brand { display: flex; align-items: center; gap: 12px; }
+        .top-bar .brand img { height: 42px; }
+        .top-bar .brand-text h2 { font-size: 17px; font-weight: 700; }
+        .top-bar .brand-text small { font-size: 11px; opacity: 0.75; letter-spacing: 1px; text-transform: uppercase; }
+        .back-link { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+        .back-link:hover { color: white; }
+
+        /* FORM CARD */
+        .form-card { background: white; border-radius: 0 0 16px 16px; padding: 36px 40px 48px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
+        .card-title { font-family: 'Playfair Display', serif; color: var(--green); font-size: 26px; margin-bottom: 6px; }
+        .card-sub { color: #777; font-size: 14px; margin-bottom: 34px; }
+
+        /* SECTIONS */
+        .section { margin-bottom: 34px; }
+        .section-head {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--mid);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--lt);
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* FORM ROWS */
+        .row { display: flex; gap: 18px; flex-wrap: wrap; }
+        .fg { flex: 1; min-width: 200px; margin-bottom: 18px; }
+        .fg.full { flex: 100%; }
+        .fg label { display: block; font-size: 12.5px; font-weight: 600; color: #444; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .req { color: var(--err); margin-left: 2px; }
+        .fg input, .fg select, .fg textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #dde3ec;
+            border-radius: 10px;
+            font-size: 14.5px;
+            font-family: 'DM Sans', sans-serif;
+            color: #333;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+        .fg input:focus, .fg select:focus, .fg textarea:focus {
+            outline: none;
+            border-color: var(--mid);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+        }
+        .fg input.invalid, .fg select.invalid { border-color: var(--err); }
+        .hint { font-size: 12px; color: var(--err); margin-top: 5px; display: none; }
+        .hint.show { display: block; }
+
+        /* SIGNATURE */
+        .sig-methods { display: flex; gap: 10px; margin-bottom: 16px; }
+        .sig-tab {
+            flex: 1; padding: 10px; border: 1.5px solid #dde3ec;
+            border-radius: 10px; background: white; cursor: pointer;
+            font-size: 13px; font-weight: 600; color: #777;
+            transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+        }
+        .sig-tab.active { border-color: var(--mid); background: var(--lt); color: var(--green); }
+
+        .canvas-wrap {
+            position: relative;
+            border: 1.5px solid #dde3ec;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+        #sig-canvas { display: block; width: 100%; height: 160px; cursor: crosshair; touch-action: none; }
+        .canvas-tools {
+            display: flex; gap: 8px; padding: 8px 12px;
+            background: #f8f9fa; border-top: 1px solid #eee;
+        }
+        .canvas-tools button {
+            padding: 6px 14px; border: 1px solid #ddd; border-radius: 8px;
+            background: white; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+        }
+        .canvas-tools button:hover { background: #f0f0f0; }
+        .canvas-tools .pen-size { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; margin-left: auto; }
+        .canvas-tools .pen-size input { width: 70px; }
+
+        .upload-zone {
+            border: 2px dashed var(--mid);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: var(--lt);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .upload-zone:hover { background: #dcedc8; }
+        .upload-zone i { font-size: 36px; color: var(--mid); margin-bottom: 10px; display: block; }
+        .upload-zone p { font-size: 14px; color: #555; }
+        .upload-zone input[type="file"] { display: none; }
+        #sig-preview { margin-top: 12px; display: none; }
+        #sig-preview img { max-height: 90px; border: 1px solid #ddd; border-radius: 8px; }
+
+        /* PHOTO UPLOAD */
+        .photo-zone {
+            border: 2px dashed var(--mid);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            background: var(--lt);
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .photo-zone:hover { background: #dcedc8; }
+        .photo-zone input[type="file"] { display: none; }
+        .photo-zone i { font-size: 40px; color: var(--mid); margin-bottom: 10px; }
+        .photo-zone p { font-size: 14px; color: #555; }
+        .photo-zone small { font-size: 12px; color: #999; }
+        #photo-preview { margin-top: 14px; display: none; text-align: center; }
+        #photo-preview img { max-height: 120px; border-radius: 8px; border: 1px solid #ddd; }
+
+        /* SUBMIT */
+        .submit-btn {
+            width: 100%;
+            padding: 17px;
+            background: var(--mid);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+            box-shadow: 0 6px 20px rgba(46,125,50,0.3);
+            margin-top: 8px;
+        }
+        .submit-btn:hover { background: var(--green); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(46,125,50,0.4); }
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* SUCCESS */
+        #success-panel {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            padding: 56px 40px;
+            text-align: center;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+        }
+        .success-icon { font-size: 72px; color: #28a745; margin-bottom: 20px; animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        #success-panel h2 { font-family: 'Playfair Display', serif; color: var(--green); font-size: 28px; margin-bottom: 10px; }
+        #success-panel p { color: #666; margin-bottom: 28px; font-size: 15px; }
+        .tracking-box {
+            background: var(--lt);
+            border: 2px dashed var(--mid);
+            border-radius: 14px;
+            padding: 24px 30px;
+            margin: 0 auto 30px;
+            max-width: 420px;
+        }
+        .tracking-box .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
+        .tracking-num {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--green);
+            background: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--mid);
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        .save-note { font-size: 13px; color: var(--err); font-weight: 600; }
+        .action-row { display: flex; flex-direction: column; gap: 12px; max-width: 380px; margin: 0 auto; }
+        .action-row a {
+            padding: 15px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .action-row a.primary { background: var(--mid); color: white; box-shadow: 0 4px 14px rgba(46,125,50,0.25); }
+        .action-row a.primary:hover { background: var(--green); }
+        .action-row a.ghost { background: white; color: var(--mid); border: 2px solid var(--mid); }
+        .action-row a.ghost:hover { background: var(--lt); }
+
+        /* SPINNER */
+        .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 600px) {
+            .form-card { padding: 24px 18px 36px; }
+            .top-bar { padding: 14px 18px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="brand">
+            <img src="photo/acespicture-modified (1).png" alt="Logo" onerror="this.style.display='none'">
+            <div class="brand-text">
+                <h2>Student ID Request</h2>
+                <small>ACES Polytechnic College</small>
+            </div>
+        </div>
+        <a href="request.html" class="back-link"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="form-card" id="form-panel">
+        <h1 class="card-title">ID Request Form</h1>
+        <p class="card-sub">All fields marked <span style="color:var(--err);">*</span> are required.</p>
+
+        <form id="mainForm" novalidate>
+
+            <!-- REQUEST INFO -->
+            <div class="section">
+                <div class="section-head"><i class="fas fa-file-alt"></i> Request Information</div>
+                <div class="row">
+                    <div class="fg">
+                        <label>Request Type <span class="req">*</span></label>
+                        <select id="requestType" required>
+                            <option value="" disabled selected hidden>Select type</option>
+                            <option value="New">New</option>
+                            <option value="Lost">Lost / Replacement</option>
+                            <option value="Damaged">Damaged</option>
+                        </select>
+                    </div>
+                    <div class="fg">
+                        <label>Student Status <span class="req">*</span></label>
+                        <select id="studentStatus" required>
+                            <option value="" disabled selected hidden>Select status</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Irregular">Irregular</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PERSONAL INFO -->
+            <div class="section">
+                <div class="section-head"><i class="fas fa-user"></i> Personal Information</div>
+                <div class="row">
+                    <div class="fg">
+                        <label>Student ID Number <span class="req">*</span></label>
+                        <input type="text" id="studentId" placeholder="e.g. 140123"
+                            maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" required>
+                        <div class="hint" id="idHint">Must start with 1 and be exactly 6 digits.</div>
+                    </div>
+                    <div class="fg">
+                        <label>Full Name <span class="req">*</span></label>
+                        <input type="text" id="fullName" placeholder="First Middle Last" required>
+                    </div>
+                    <div class="fg">
+                        <label>Birthdate <span class="req">*</span></label>
+                        <input type="date" id="birthdate" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="fg">
+                        <label>Department <span class="req">*</span></label>
+                        <select id="department" required>
+                            <option value="" disabled selected hidden>Select department</option>
+                            <option value="Bachelor of Science in Information Technology">BS Information Technology</option>
+                            <option value="Bachelor of Science in Agribusiness">BS Agribusiness</option>
+                            <option value="Bachelor of Science in Hospitality Management">BS Hospitality Management</option>
+                            <option value="Bachelor in Technical-Vocational Teacher Education">BS Tech-Voc Teacher Education</option>
+                            <option value="Bachelor of Science in Criminology">BS Criminology</option>
+                        </select>
+                    </div>
+                    <div class="fg">
+                        <label>Year Level <span class="req">*</span></label>
+                        <select id="yearLevel" required>
+                            <option value="" disabled selected hidden>Select year</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACT -->
+            <div class="section">
+                <div class="section-head"><i class="fas fa-phone"></i> Contact Information</div>
+                <div class="row">
+                    <div class="fg full">
+                        <label>Home Address <span class="req">*</span></label>
+                        <input type="text" id="address" placeholder="Complete Address" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="fg">
+                        <label>Contact Number <span class="req">*</span></label>
+                        <input type="tel" id="contact" placeholder="09XXXXXXXXX"
+                            oninput="this.value=this.value.replace(/\D/g,'')" maxlength="11" required>
+                        <div class="hint" id="contactHint">Must be a valid 11-digit PH number (09...).</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMERGENCY -->
+            <div class="section">
+                <div class="section-head"><i class="fas fa-heartbeat"></i> In Case of Emergency</div>
+                <div class="row">
+                    <div class="fg">
+                        <label>Emergency Contact Name <span class="req">*</span></label>
+                        <input type="text" id="emergencyName" placeholder="Full Name" required>
+                    </div>
+                    <div class="fg">
+                        <label>Emergency Contact Number <span class="req">*</span></label>
+                        <input type="tel" id="emergencyContact" placeholder="09XXXXXXXXX"
+                            oninput="this.value=this.value.replace(/\D/g,'')" maxlength="11" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="fg full">
+                        <label>Emergency Contact Address <span class="req">*</span></label>
+                        <input type="text" id="emergencyAddress" placeholder="Complete Address" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIGNATURE -->
+            <div class="section">
+                <div class="section-head"><i class="fas fa-signature"></i> Signature <span class="req">*</span></div>
+                <div class="sig-methods">
+                    <button type="button" class="sig-tab active" id="tab-draw" onclick="switchSig('draw')">
+                        <i class="fas fa-pen"></i> Draw Signature
+                    </button>
+                    <button type="button" class="sig-tab" id="tab-upload" onclick="switchSig('upload')">
+                        <i class="fas fa-upload"></i> Upload Image
+                    </button>
+                </div>
+
+                <!-- DRAW -->
+                <div id="sig-draw-area">
+                    <div class="canvas-wrap">
+                        <canvas id="sig-canvas"></canvas>
+                        <div class="canvas-tools">
+                            <button type="button" onclick="clearSig()"><i class="fas fa-eraser"></i> Clear</button>
+                            <button type="button" id="undoBtn" onclick="undoSig()"><i class="fas fa-undo"></i> Undo</button>
+                            <div class="pen-size">
+                                <i class="fas fa-circle" style="font-size:8px;"></i>
+                                <input type="range" id="penSize" min="1" max="12" value="3" style="width:70px;">
+                                <i class="fas fa-circle" style="font-size:14px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size:12px;color:#999;margin-top:8px;"><i class="fas fa-info-circle"></i> Draw your signature in the box above.</p>
+                </div>
+
+                <!-- UPLOAD -->
+                <div id="sig-upload-area" style="display:none;">
+                    <div class="upload-zone" onclick="document.getElementById('sigFile').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload signature image</p>
+                        <input type="file" id="sigFile" accept="image/*" onchange="onSigUpload(this)">
+                    </div>
+                    <div id="sig-preview">
+                        <p style="font-size:12px;color:#666;margin-bottom:6px;">Preview:</p>
+                        <img id="sig-preview-img" src="" alt="Signature preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ID PHOTO -->
+            <div class="section">
+                <div class="section-head"><i class="fas fa-camera"></i> ID Photo <span class="req">*</span></div>
+                <div class="photo-zone" onclick="document.getElementById('photoFile').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Upload your 2×2 passport-size photo</p>
+                    <small>White background • JPG or PNG • Max 5MB</small>
+                    <input type="file" id="photoFile" accept="image/jpeg,image/png" onchange="onPhotoUpload(this)">
+                </div>
+                <div id="photo-preview">
+                    <p style="font-size:12px;color:#666;margin-bottom:6px;">Photo Preview:</p>
+                    <img id="photo-preview-img" src="" alt="Photo preview">
+                </div>
+            </div>
+
+            <!-- REASON -->
+            <div class="section">
+                <div class="section-head"><i class="fas fa-comment-alt"></i> Reason for Request</div>
+                <div class="fg full">
+                    <label>Reason <span class="req">*</span></label>
+                    <textarea id="reason" rows="3" placeholder="e.g. First time requesting ID, Lost my previous ID..." ></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Submit ID Request
+            </button>
+
+        </form>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="success-panel">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <h2>Request Submitted!</h2>
+        <p>Your ID request is now pending admin review.</p>
+        <div class="tracking-box">
+            <div class="label">Your Tracking Number</div>
+            <div class="tracking-num" id="trackingDisplay">—</div>
+            <div class="save-note"><i class="fas fa-exclamation-triangle"></i> Save this number! You'll need it to check your status.</div>
+        </div>
+        <div class="action-row">
+            <a href="request.html" class="primary"><i class="fas fa-search"></i> Track My Request</a>
+            <a href="index.html" class="ghost"><i class="fas fa-home"></i> Back to Home</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* ── CONSTANTS ── */
+const API = '../api/requests.php';
+
+/* ── SIGNATURE CANVAS ── */
+const canvas = document.getElementById('sig-canvas');
+const ctx    = canvas.getContext('2d');
+let drawing  = false;
+let strokes  = []; // for undo
+let lastStroke = [];
+
+// // ── STEP 1: Collect the form data into a plain object ──────
+// const payload = {
+//     requestType:      document.getElementById('requestType').value,
+//     studentStatus:    document.getElementById('studentStatus').value,
+//     studentId:        document.getElementById('studentId').value.trim(),
+//     fullName:         document.getElementById('fullName').value.trim(),
+//     birthdate:        document.getElementById('birthdate').value,
+//     department:       document.getElementById('department').value,
+//     yearLevel:        document.getElementById('yearLevel').value,
+//     address:          document.getElementById('address').value.trim(),
+//     contact:          document.getElementById('contact').value.trim(),
+//     emergencyName:    document.getElementById('emergencyName').value.trim(),
+//     emergencyAddress: document.getElementById('emergencyAddress').value.trim(),
+//     emergencyContact: document.getElementById('emergencyContact').value.trim(),
+//     reason:           document.getElementById('reason').value.trim(),
+//     photo:            photoData,      // base64 string from FileReader
+//     signature:        sigData,        // base64 PNG from canvas or upload
+// };
+
+// // ── STEP 2: Send to PHP as JSON ────────────────────────────
+// const response = await fetch(
+//     '../api/requests.php?action=submit',  // ← exact URL
+//     {
+//         method:  'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body:    JSON.stringify(payload),
+//     }
+// );
+
+// // ── STEP 3: Read the JSON response from PHP ────────────────
+// const data = await response.json();
+
+// // PHP returns: { success: true, trackingNumber: "REQ-2026-83741" }
+// //          or: { error: "some message" }
+
+// if (data.success) {
+//     // Show the tracking number to the student
+//     document.getElementById('trackingDisplay').textContent = data.trackingNumber;
+//     document.getElementById('form-panel').style.display    = 'none';
+//     document.getElementById('success-panel').style.display  = 'block';
+// } else {
+//     alert('Error: ' + data.error);
+// }
+
+
+function resizeCanvas() {
+    const w = canvas.parentElement.clientWidth;
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width  = w * ratio;
+    canvas.height = 160 * ratio;
+    canvas.style.width  = w + 'px';
+    canvas.style.height = '160px';
+    ctx.scale(ratio, ratio);
+    redrawStrokes();
+}
+
+function redrawStrokes() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    strokes.forEach(pts => {
+        if (!pts.length) return;
+        ctx.beginPath();
+        ctx.lineWidth   = pts[0].size;
+        ctx.lineCap     = 'round';
+        ctx.lineJoin    = 'round';
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.moveTo(pts[0].x, pts[0].y);
+        pts.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+    });
+}
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const src  = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+}
+
+function startDraw(e) {
+    e.preventDefault();
+    drawing     = true;
+    lastStroke  = [];
+    const pos   = getPos(e);
+    const size  = parseInt(document.getElementById('penSize').value);
+    lastStroke.push({ x: pos.x, y: pos.y, size });
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+}
+
+function doDraw(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const pos  = getPos(e);
+    const size = parseInt(document.getElementById('penSize').value);
+    lastStroke.push({ x: pos.x, y: pos.y, size });
+    ctx.lineWidth   = size;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+}
+
+function endDraw(e) {
+    if (!drawing) return;
+    drawing = false;
+    if (lastStroke.length) strokes.push([...lastStroke]);
+    ctx.beginPath();
+}
+
+canvas.addEventListener('mousedown',  startDraw);
+canvas.addEventListener('mousemove',  doDraw);
+canvas.addEventListener('mouseup',    endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+canvas.addEventListener('touchstart', startDraw, { passive: false });
+canvas.addEventListener('touchmove',  doDraw,    { passive: false });
+canvas.addEventListener('touchend',   endDraw);
+
+function clearSig() { strokes = []; ctx.clearRect(0, 0, canvas.width, canvas.height); }
+function undoSig()  { strokes.pop(); redrawStrokes(); }
+
+/* ── SIGNATURE TABS ── */
+let sigMode = 'draw';
+let uploadedSigData = '';
+
+function switchSig(mode) {
+    sigMode = mode;
+    document.getElementById('sig-draw-area').style.display   = mode === 'draw'   ? 'block' : 'none';
+    document.getElementById('sig-upload-area').style.display = mode === 'upload' ? 'block' : 'none';
+    document.getElementById('tab-draw').classList.toggle('active',   mode === 'draw');
+    document.getElementById('tab-upload').classList.toggle('active', mode === 'upload');
+}
+
+function onSigUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+        uploadedSigData = fr.result;
+        document.getElementById('sig-preview-img').src = fr.result;
+        document.getElementById('sig-preview').style.display = 'block';
+    };
+    fr.readAsDataURL(file);
+}
+
+/* ── PHOTO UPLOAD ── */
+let photoData = '';
+
+function onPhotoUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Photo must be under 5MB.'); input.value = ''; return; }
+    const fr = new FileReader();
+    fr.onload = () => {
+        photoData = fr.result;
+        document.getElementById('photo-preview-img').src = fr.result;
+        document.getElementById('photo-preview').style.display = 'block';
+    };
+    fr.readAsDataURL(file);
+}
+
+/* ── VALIDATION ── */
+function validateId(v)      { return /^1\d{5}$/.test(v); }
+function validatePhone(v)   { return /^09\d{9}$/.test(v); }
+
+/* ── FORM SUBMIT ── */
+
+// // ── AFTER (API-first, localStorage as fallback) ───────────
+// async function submitRequest(payload) {
+
+//     // ── TRY the real PHP API first ─────────────────────────
+//     try {
+//         const res  = await fetch('../api/requests.php?action=submit', {
+//             method:  'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body:    JSON.stringify(payload),
+//         });
+//         const data = await res.json();
+
+//         if (data.success) {
+//             // ✅ PHP worked — return the real tracking number
+//             return { ok: true, trackingNumber: data.trackingNumber, source: 'db' };
+//         }
+//         // PHP responded but with an application error — still fall through
+//         throw new Error(data.error || 'API error');
+
+//     } catch (err) {
+//         // ── FALLBACK — PHP failed (network, XAMPP off, etc.) ───
+//         // This is identical to your old localStorage-only code
+//         const year    = new Date().getFullYear();
+//         const rand    = String(Math.floor(10000 + Math.random() * 90000));
+//         const tn      = `REQ-${year}-${rand}`;
+
+//         const entry   = { ...payload, trackingNumber: tn, status: 'Pending',
+//                           submittedAt: new Date().toLocaleString() };
+//         let all       = JSON.parse(localStorage.getItem('allIdRequests') || '[]');
+//         all.unshift(entry);
+//         localStorage.setItem('allIdRequests', JSON.stringify(all));
+//         localStorage.setItem('lastIdRequest',  JSON.stringify(entry));
+
+//         return { ok: true, trackingNumber: tn, source: 'localStorage' };
+//     }
+// }
+
+// // ── Calling it (inside your form submit handler) ──────────
+// const result = await submitRequest(payload);
+
+// if (result.ok) {
+//     // Same UI update regardless of which source was used
+//     document.getElementById('trackingDisplay').textContent = result.trackingNumber;
+//     document.getElementById('form-panel').style.display   = 'none';
+//     document.getElementById('success-panel').style.display = 'block';
+// }
+
+document.getElementById('mainForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const sid = document.getElementById('studentId').value.trim();
+    const tel = document.getElementById('contact').value.trim();
+    let ok = true;
+
+    if (!validateId(sid)) {
+        document.getElementById('idHint').classList.add('show');
+        document.getElementById('studentId').classList.add('invalid');
+        ok = false;
+    } else {
+        document.getElementById('idHint').classList.remove('show');
+        document.getElementById('studentId').classList.remove('invalid');
+    }
+
+    if (!validatePhone(tel)) {
+        document.getElementById('contactHint').classList.add('show');
+        document.getElementById('contact').classList.add('invalid');
+        ok = false;
+    } else {
+        document.getElementById('contactHint').classList.remove('show');
+        document.getElementById('contact').classList.remove('invalid');
+    }
+
+    if (!photoData) { alert('Please upload your 2×2 ID photo.'); ok = false; }
+
+    // Signature check
+    let sigData = '';
+    if (sigMode === 'draw') {
+        // Check if canvas has actual strokes
+        if (!strokes.length) { alert('Please provide your signature by drawing in the box.'); ok = false; }
+        else sigData = canvas.toDataURL('image/png');
+    } else {
+        if (!uploadedSigData) { alert('Please upload your signature image.'); ok = false; }
+        else sigData = uploadedSigData;
+    }
+
+    if (!ok) return;
+
+    // Collect
+    const payload = {
+        requestType:      document.getElementById('requestType').value,
+        studentStatus:    document.getElementById('studentStatus').value,
+        studentId:        sid,
+        fullName:         document.getElementById('fullName').value.trim(),
+        birthdate:        document.getElementById('birthdate').value,
+        department:       document.getElementById('department').value,
+        yearLevel:        document.getElementById('yearLevel').value,
+        address:          document.getElementById('address').value.trim(),
+        contact:          tel,
+        emergencyName:    document.getElementById('emergencyName').value.trim(),
+        emergencyContact: document.getElementById('emergencyContact').value.trim(),
+        emergencyAddress: document.getElementById('emergencyAddress').value.trim(),
+        reason:           document.getElementById('reason').value.trim(),
+        photo:            photoData,
+        signature:        sigData,
+    };
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
+    try {
+        const res  = await fetch(API + '?action=submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            // Show success
+            document.getElementById('form-panel').style.display    = 'none';
+            document.getElementById('success-panel').style.display = 'block';
+            document.getElementById('trackingDisplay').textContent  = data.trackingNumber;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Cache for track page
+            localStorage.setItem('lastTracking',  data.trackingNumber);
+            localStorage.setItem('lastStudentId', payload.studentId);
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit ID Request';
+        }
+    } catch (err) {
+        // Fallback: localStorage mode (for when PHP isn't running)
+        const year   = new Date().getFullYear();
+        const rand   = String(Math.floor(10000 + Math.random() * 90000));
+        const tn     = `REQ-${year}-${rand}`;
+        payload.trackingNumber = tn;
+        payload.status         = 'Pending';
+        payload.submittedAt    = new Date().toLocaleString();
+
+        let all = JSON.parse(localStorage.getItem('allIdRequests') || '[]');
+        all.unshift(payload);
+        localStorage.setItem('allIdRequests', JSON.stringify(all));
+        localStorage.setItem('lastIdRequest',  JSON.stringify(payload));
+        localStorage.setItem('lastTracking',   tn);
+        localStorage.setItem('lastStudentId',  payload.studentId);
+
+        document.getElementById('form-panel').style.display    = 'none';
+        document.getElementById('success-panel').style.display = 'block';
+        document.getElementById('trackingDisplay').textContent  = tn;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+});
+
+/* ── INIT ── */
+window.addEventListener('load',   resizeCanvas);
+window.addEventListener('resize', resizeCanvas);
+</script>
+</body>
+</html>

@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STIRS – Admin Oversight Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --green:  #1B5E20;
+            --mid:    #2E7D32;
+            --lt:     #E8F5E9;
+            --bg:     #f0f4f8;
+            --card:   #ffffff;
+            --text:   #2d3748;
+            --muted:  #718096;
+            --border: #e2e8f0;
+            --gold:   #C9A84C;
+            --nav-h:  68px;
+        }
+
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+        /* ─── NAV ─── */
+        .navbar {
+            background: var(--green);
+            height: var(--nav-h);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 36px;
+            position: sticky; top: 0; z-index: 200;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+        }
+        .nav-brand { display: flex; align-items: center; gap: 12px; color: white; }
+        .nav-brand img { height: 44px; }
+        .nav-brand .t1 { font-size: 17px; font-weight: 700; display: block; }
+        .nav-brand .t2 { font-size: 10.5px; opacity: 0.7; letter-spacing: 1.2px; text-transform: uppercase; }
+
+        .nav-links { display: flex; gap: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 7px;
+            color: rgba(255,255,255,0.72); text-decoration: none;
+            padding: 8px 18px; border-radius: 10px;
+            font-size: 14px; font-weight: 600;
+            transition: all 0.2s; cursor: pointer; border: none; background: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.12); }
+        .nav-link.active { color: white; background: rgba(255,255,255,0.18); }
+        .nav-badge {
+            background: #fbbf24; color: #1c1917;
+            font-size: 11px; font-weight: 800; padding: 2px 7px;
+            border-radius: 20px; display: none;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .admin-chip {
+            display: flex; align-items: center; gap: 9px;
+            background: rgba(255,255,255,0.14); color: white;
+            padding: 7px 16px; border-radius: 30px; font-size: 14px;
+        }
+        .logout-btn {
+            background: none; border: none; color: rgba(255,255,255,0.7);
+            font-size: 19px; cursor: pointer; transition: color 0.2s, transform 0.2s;
+        }
+        .logout-btn:hover { color: #fca5a5; transform: scale(1.1); }
+
+        /* ─── MAIN ─── */
+        .main { padding: 36px 48px; max-width: 1400px; margin: 0 auto; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 30px;
+        }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text); }
+        .page-header .sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+        /* ─── STAT CARDS ─── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--card); border-radius: 16px;
+            padding: 22px 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            display: flex; align-items: center; gap: 16px;
+            border-left: 5px solid transparent;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+        .stat-card.s-total    { border-color: #3b82f6; }
+        .stat-card.s-pending  { border-color: #f59e0b; }
+        .stat-card.s-approved { border-color: #22c55e; }
+        .stat-card.s-rejected { border-color: #ef4444; }
+        .stat-icon {
+            width: 50px; height: 50px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .s-total .stat-icon    { background: #eff6ff; color: #3b82f6; }
+        .s-pending .stat-icon  { background: #fffbeb; color: #f59e0b; }
+        .s-approved .stat-icon { background: #f0fdf4; color: #22c55e; }
+        .s-rejected .stat-icon { background: #fef2f2; color: #ef4444; }
+        .stat-info p  { font-size: 12.5px; color: var(--muted); margin-bottom: 3px; }
+        .stat-info h2 { font-size: 32px; font-weight: 800; color: var(--text); line-height: 1; }
+        .stat-info small { font-size: 11.5px; color: #aaa; }
+
+        /* ─── BOTTOM CARDS ─── */
+        .dash-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chart-card {
+            background: var(--card); border-radius: 16px;
+            padding: 24px; box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        }
+        .chart-card h3 { font-size: 14px; font-weight: 700; color: #444; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+        .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .bar-label { font-size: 12.5px; color: var(--muted); width: 72px; flex-shrink: 0; }
+        .bar-track { flex: 1; background: #f0f0f0; border-radius: 6px; height: 12px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 6px; transition: width 0.9s ease; }
+        .bar-count { font-size: 13px; font-weight: 700; width: 24px; text-align: right; }
+
+        .recent-list { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .ri {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 12px; background: #f9fafb; border-radius: 10px; font-size: 13.5px;
+        }
+        .ri-left { display: flex; align-items: center; gap: 10px; }
+        .ri-name { font-weight: 600; }
+        .ri-id { font-size: 12px; color: #999; }
+
+        /* ─── TABLE ─── */
+        .table-wrap {
+            background: var(--card); border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        .data-table {
+            width: 100%; border-collapse: collapse; text-align: left;
+        }
+        .data-table th {
+            background: #f8f9fb; padding: 16px 20px;
+            border-bottom: 2px solid var(--border);
+            font-size: 11.5px; color: var(--muted);
+            text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;
+        }
+        .data-table td {
+            padding: 16px 20px; border-bottom: 1px solid #f3f4f6;
+            font-size: 14px; color: #444; vertical-align: middle;
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #fafbfc; }
+
+        /* ─── BADGES ─── */
+        .badge { padding: 5px 13px; border-radius: 20px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+        .badge.pending  { background: #fef3c7; color: #92400e; }
+        .badge.approved { background: #dcfce7; color: #166534; }
+        .badge.rejected { background: #fee2e2; color: #991b1b; }
+
+        /* ─── BUTTONS ─── */
+        .btn { padding: 8px 16px; border: none; border-radius: 9px; cursor: pointer; font-weight: 700; font-size: 12.5px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+        .btn-review  { background: #dbeafe; color: #1d4ed8; }
+        .btn-review:hover { background: #bfdbfe; }
+        .btn-approve { background: #dcfce7; color: #15803d; }
+        .btn-approve:hover { background: #bbf7d0; }
+        .btn-reject  { background: #fee2e2; color: #b91c1c; }
+        .btn-reject:hover { background: #fecaca; }
+        .btn-reset   { background: #f1f5f9; color: #475569; }
+        .btn-reset:hover { background: #e2e8f0; }
+
+        /* ─── SEARCH / FILTERS ─── */
+        .search-wrap {
+            display: flex; align-items: center; gap: 10px;
+            background: white; border: 1.5px solid var(--border); border-radius: 30px;
+            padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+        .search-wrap input { border: none; outline: none; font-size: 14px; width: 240px; font-family: 'DM Sans', sans-serif; }
+
+        .filters { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .filters select, .filters input {
+            padding: 9px 14px; border: 1.5px solid var(--border);
+            border-radius: 10px; font-size: 13.5px; outline: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .filters select:focus, .filters input:focus { border-color: var(--mid); }
+
+        /* ─── EMPTY ─── */
+        .empty { text-align: center; padding: 56px 20px; color: #ccc; }
+        .empty i { font-size: 44px; margin-bottom: 14px; display: block; }
+        .empty p { font-size: 15px; }
+
+        /* ─── MODAL ─── */
+        #reviewModal {
+            display: none; position: fixed;
+            inset: 0; background: rgba(0,0,0,0.58);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        #reviewModal.open { display: flex; }
+
+        .modal-card {
+            background: white; width: 100%; max-width: 660px;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+            animation: mPop 0.28s cubic-bezier(0.34,1.56,0.64,1);
+            max-height: 92vh; overflow-y: auto;
+        }
+        @keyframes mPop { from { transform: scale(0.88) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .modal-head {
+            background: linear-gradient(135deg, var(--green), var(--mid));
+            color: white; padding: 22px 28px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 2;
+        }
+        .modal-head h2 { font-size: 18px; margin-bottom: 3px; }
+        .modal-head small { opacity: 0.75; font-family: monospace; font-size: 13px; }
+        .modal-close {
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 34px; height: 34px; border-radius: 50%; font-size: 20px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.35); }
+
+        .modal-body {
+            padding: 26px 28px;
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        /* Photo */
+        .photo-box { text-align: center; }
+        .photo-box img { width: 110px; height: 120px; object-fit: cover; border-radius: 10px; border: 2px solid var(--border); }
+        .photo-box .no-photo {
+            width: 110px; height: 120px;
+            background: linear-gradient(135deg, #f0f9f0, #e8f5e9);
+            border: 2px dashed #81c784; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #81c784; font-size: 42px;
+        }
+        .photo-label { font-size: 10.5px; text-transform: uppercase; color: #999; margin-top: 7px; font-weight: 700; letter-spacing: 0.5px; }
+        .sig-box { margin-top: 10px; text-align: center; }
+        .sig-box img { max-width: 110px; max-height: 50px; border: 1px solid #ddd; border-radius: 6px; }
+        .sig-label { font-size: 10px; color: #bbb; text-transform: uppercase; margin-top: 4px; }
+
+        /* Info grid */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .info-group.span2 { grid-column: span 2; }
+        .info-group label {
+            display: block; font-size: 10.5px; color: var(--muted);
+            margin-bottom: 3px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .df {
+            font-weight: 600; color: var(--text); font-size: 14px;
+            border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; min-height: 22px;
+        }
+
+        /* Reject comment */
+        #rejectSection { padding: 0 28px 18px; display: none; }
+        #rejectSection > label { display: block; font-size: 11.5px; font-weight: 800; color: #b91c1c; text-transform: uppercase; margin-bottom: 8px; }
+        #rejectComment {
+            width: 100%; padding: 10px 13px;
+            border: 2px solid #fca5a5; border-radius: 10px;
+            font-size: 14px; font-family: 'DM Sans', sans-serif;
+            resize: vertical; outline: none; box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        #rejectComment:focus { border-color: #b91c1c; }
+
+        /* Modal footer */
+        .modal-foot {
+            padding: 16px 28px; background: #f8fafc;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: 10px;
+        }
+
+        /* SPINNER */
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #333; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) {
+            .main { padding: 20px 14px; }
+            .navbar { padding: 0 16px; }
+            .modal-body { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar">
+    <div class="nav-brand">
+        <img src="../photo/acespicture-modified (1).png" alt="Logo" onerror="this.style.display='none'">
+        <div>
+            <span class="t1">ACES STIRS</span>
+            <span class="t2">Admin Oversight Panel</span>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <button class="nav-link active" id="nl-dashboard" onclick="show('dashboard', this)">
+            <i class="fas fa-chart-pie"></i> Dashboard
+        </button>
+        <button class="nav-link" id="nl-pending" onclick="show('pending', this)">
+            <i class="fas fa-clock"></i> Pending
+            <span class="nav-badge" id="pendingBadge"></span>
+        </button>
+        <button class="nav-link" id="nl-archives" onclick="show('archives', this)">
+            <i class="fas fa-archive"></i> Archives
+        </button>
+    </div>
+
+    <div class="nav-right">
+        <div class="admin-chip">
+            <i class="fas fa-user-circle" style="font-size:20px;"></i>
+            <span>Welcome, <strong id="adminName">Admin</strong></span>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
+</nav>
+
+<main class="main">
+
+    <!-- ════════════════════════════
+         DASHBOARD
+    ════════════════════════════ -->
+    <section id="sec-dashboard" class="page-section active">
+        <div class="page-header">
+            <div>
+                <h1>Oversight Dashboard</h1>
+                <div class="sub">System health at a glance</div>
+            </div>
+            <div style="font-size:13px;color:var(--muted);" id="refreshTime"></div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card s-total">
+                <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                <div class="stat-info"><p>Total Requests</p><h2 id="sTotal">0</h2><small>All time</small></div>
+            </div>
+            <div class="stat-card s-pending">
+                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-info"><p>Pending</p><h2 id="sPending">0</h2><small>Needs action</small></div>
+            </div>
+            <div class="stat-card s-approved">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info"><p>Approved</p><h2 id="sApproved">0</h2><small>Completed</small></div>
+            </div>
+            <div class="stat-card s-rejected">
+                <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-info"><p>Rejected</p><h2 id="sRejected">0</h2><small>Returned</small></div>
+            </div>
+        </div>
+
+        <div class="dash-bottom">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-bar" style="color:var(--mid);"></i> Status Overview</h3>
+                <div id="barChart"></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-history" style="color:var(--mid);"></i> Recent Activity</h3>
+                <div class="recent-list" id="recentList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════════════════
+         PENDING
+    ════════════════════════════ -->
+    <section id="sec-pending" class="page-section">
+        <div class="page-header">
+            <div>
+                <h1>Pending Requests</h1>
+                <div class="sub">Requests awaiting your decision — disappear once processed</div>
+            </div>
+            <div class="search-wrap">
+                <i class="fas fa-search" style="color:#aaa;"></i>
+                <input type="text" id="pendingSearch" placeholder="Search tracking no., name, ID…" oninput="renderPending()">
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date Submitted</th>
+                        <th>Tracking No.</th>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Request Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingTbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ════════════════════════════
+         ARCHIVES
+    ════════════════════════════ -->
+    <section id="sec-archives" class="page-section">
+        <div class="page-header">
+            <div>
+                <h1>Archives</h1>
+                <div class="sub">Complete historical record of every request ever submitted</div>
+            </div>
+        </div>
+        <div class="filters">
+            <span style="font-size:13px;font-weight:700;color:#555;"><i class="fas fa-filter"></i> Filter:</span>
+            <select id="archiveStatus" onchange="renderArchives()">
+                <option value="all">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <input type="text" id="archiveSearch" placeholder="Search student ID, name, tracking…"
+                oninput="renderArchives()" style="width:280px;">
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Tracking No.</th>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Admin Note</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="archiveTbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<!-- ─── MODAL ─── -->
+<div id="reviewModal" onclick="maybeClose(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-head">
+            <div>
+                <h2><i class="fas fa-clipboard-check" style="margin-right:8px;"></i>Request Review</h2>
+                <small id="modalTracking"></small>
+            </div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- PHOTO + SIG -->
+            <div class="photo-box">
+                <div id="photoDisplay"></div>
+                <span class="photo-label">ID Photo</span>
+                <div class="sig-box" id="sigBox"></div>
+                <span class="sig-label" id="sigLabel"></span>
+            </div>
+
+            <!-- INFO -->
+            <div class="info-grid">
+                <div class="info-group"><label><i class="fas fa-user"></i> Full Name</label><p id="mName" class="df">—</p></div>
+                <div class="info-group"><label><i class="fas fa-id-card"></i> Student ID</label><p id="mStudId" class="df">—</p></div>
+                <div class="info-group"><label><i class="fas fa-graduation-cap"></i> Department</label><p id="mDept" class="df">—</p></div>
+                <div class="info-group"><label><i class="fas fa-calendar"></i> Year Level</label><p id="mYear" class="df">—</p></div>
+                <div class="info-group"><label><i class="fas fa-file-alt"></i> Request Type</label><p id="mType" class="df">—</p></div>
+                <div class="info-group"><label><i class="fas fa-users"></i> Student Status</label><p id="mStatus2" class="df">—</p></div>
+                <div class="info-group"><label><i class="fas fa-phone"></i> Contact</label><p id="mContact" class="df">—</p></div>
+                <div class="info-group"><label><i class="fas fa-birthday-cake"></i> Birthdate</label><p id="mBday" class="df">—</p></div>
+                <div class="info-group span2"><label><i class="fas fa-map-marker-alt"></i> Address</label><p id="mAddr" class="df">—</p></div>
+                <div class="info-group span2"><label><i class="fas fa-heartbeat"></i> Emergency Contact</label><p id="mEmergency" class="df">—</p></div>
+                <div class="info-group span2"><label><i class="fas fa-comment-dots"></i> Reason</label><p id="mReason" class="df">—</p></div>
+            </div>
+        </div>
+
+        <!-- REJECT COMMENT -->
+        <div id="rejectSection">
+            <label><i class="fas fa-exclamation-circle"></i> Reason for Rejection <span style="color:#b91c1c;">*</span></label>
+            <textarea id="rejectComment" rows="3" placeholder="Enter reason (e.g. blurry photo, missing information)…"></textarea>
+        </div>
+
+        <div class="modal-foot" id="modalFoot"></div>
+    </div>
+</div>
+
+<script>
+/* ══════════════════════════════════
+   CONSTANTS & STATE
+══════════════════════════════════ */
+const API       = '../api/requests.php';
+let _activeId   = null;   // DB id OR tracking_number (localStorage mode)
+let _activeMode = 'db';   // 'db' or 'ls'
+let _allData    = [];     // cache
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+window.addEventListener('load', async () => {
+    document.getElementById('adminName').textContent =
+        sessionStorage.getItem('adminName') || 'Admin Doms';
+    await loadData();
+    renderDashboard();
+    updateBadge();
+});
+
+
+async function loadData() {
+    try {
+        // Try PHP API — returns JSON array of all requests
+        const res  = await fetch('../api/requests.php?action=list&status=all&q=');
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+            // ✅ PHP responded with real data
+            _allData = data.map(normaliseDB);   // normalise DB column names
+            _mode    = 'db';
+            return;
+        }
+        throw new Error('Not an array');
+
+    } catch (_) {
+        // ── Fallback: read from localStorage ───────────────────
+        _mode    = 'localStorage';
+        const raw  = JSON.parse(localStorage.getItem('allIdRequests') || '[]');
+        _allData = raw.map(normaliseLS);  // normalise localStorage key names
+    }
+}
+
+// ── normaliseDB: maps DB column names → your app's field names ──
+function normaliseDB(r) {
+    return {
+        _id:            r.id,                    // DB primary key for decide action
+        _mode:          'db',
+        trackingNumber: r.tracking_number,      // snake_case → camelCase
+        studentId:      r.student_id,
+        fullName:       r.full_name,
+        department:     r.department,
+        requestType:    r.request_type,
+        status:         r.status || 'Pending',
+        adminComment:   r.admin_comment || '',
+        submittedAt:    r.submitted_at,
+    };
+}
+
+// ── normaliseLS: localStorage keys are already camelCase ────────
+function normaliseLS(r) {
+    return {
+        _id:            r.trackingNumber,   // no DB id, use tracking as key
+        _mode:          'localStorage',
+        trackingNumber: r.trackingNumber,
+        studentId:      r.studentId,
+        fullName:       r.fullName,
+        department:     r.department,
+        requestType:    r.requestType,
+        status:         r.status || 'Pending',
+        adminComment:   r.adminComment || '',
+        submittedAt:    r.submittedAt,
+    };
+}
+
+/* ══════════════════════════════════
+   DATA LAYER
+   Tries PHP API → falls back to localStorage
+══════════════════════════════════ */
+// async function loadData() {
+//     try {
+//         const res  = await fetch(API + '?action=list&status=all&q=');
+//         const data = await res.json();
+//         if (Array.isArray(data)) {
+//             _allData    = data.map(normaliseDB);
+//             _activeMode = 'db';
+//             return;
+//         }
+//     } catch (_) {}
+
+//     // localStorage fallback
+//     _activeMode = 'ls';
+//     const raw   = JSON.parse(localStorage.getItem('allIdRequests') || '[]');
+//     const legacy = JSON.parse(localStorage.getItem('lastIdRequest') || 'null');
+//     if (legacy) {
+//         const exists = raw.find(r => r.trackingNumber === legacy.trackingNumber);
+//         if (!exists) raw.unshift(legacy);
+//     }
+//     _allData = raw.map(normaliseLS);
+// }
+
+function normaliseDB(r) {
+    return {
+        _id:           r.id,
+        _mode:         'db',
+        trackingNumber: r.tracking_number,
+        studentId:     r.student_id,
+        fullName:      r.full_name,
+        department:    r.department,
+        yearLevel:     r.year_level,
+        requestType:   r.request_type,
+        studentStatus: r.student_status,
+        reason:        r.reason,
+        address:       r.address,
+        contact:       r.contact,
+        emergencyName: r.emergency_name,
+        emergencyAddress: r.emergency_address,
+        emergencyContact: r.emergency_contact,
+        birthdate:     r.birthdate,
+        photo:         r.photo,
+        signature:     r.signature,
+        status:        r.status   || 'Pending',
+        adminComment:  r.admin_comment || '',
+        submittedAt:   r.submitted_at,
+        processedAt:   r.processed_at,
+    };
+}
+
+function normaliseLS(r) {
+    return {
+        _id:           r.trackingNumber,   // use tracking as key for LS
+        _mode:         'ls',
+        trackingNumber: r.trackingNumber,
+        studentId:     r.studentId,
+        fullName:      r.fullName,
+        department:    r.department,
+        yearLevel:     r.yearLevel,
+        requestType:   r.requestType,
+        studentStatus: r.studentStatus || r.class,
+        reason:        r.reason,
+        address:       r.address,
+        contact:       r.contact,
+        emergencyName: r.emergencyName,
+        emergencyAddress: r.emergencyAddress,
+        emergencyContact: r.emergencyContact,
+        birthdate:     r.birthdate,
+        photo:         r.photo,
+        signature:     r.signature,
+        status:        r.status || 'Pending',
+        adminComment:  r.adminComment || '',
+        submittedAt:   r.submittedAt,
+        processedAt:   r.processedAt,
+    };
+}
+
+async function saveDecision(id, mode, status, comment) {
+
+    if (mode === 'db') {
+        // ── DB MODE: POST to decide endpoint ─────────────────
+        // id here is the MySQL primary key (integer)
+        await fetch('../api/requests.php?action=decide', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+                id:           id,         // MySQL row id
+                status:       status,     // 'Approved' or 'Rejected'
+                adminComment: comment,    // rejection reason (or '')
+            }),
+        });
+
+    } else {
+        // ── localStorage MODE: update the array in-place ─────
+        // id here is the trackingNumber string
+        let arr = JSON.parse(localStorage.getItem('allIdRequests') || '[]');
+        const idx = arr.findIndex(r => r.trackingNumber === id);
+
+        if (idx !== -1) {
+            arr[idx].status       = status;
+            arr[idx].adminComment = comment;
+        }
+
+        localStorage.setItem('allIdRequests', JSON.stringify(arr));
+        // Sync the lastIdRequest key so student tracking page stays current
+        if (arr.length > 0)
+            localStorage.setItem('lastIdRequest', JSON.stringify(arr[0]));
+    }
+
+    // ── Update local cache regardless of source ───────────
+    // This prevents a full reload to reflect the change
+    const rec = _allData.find(r => String(r._id) === String(id));
+    if (rec) {
+        rec.status       = status;
+        rec.adminComment = comment;
+    }
+}
+
+// async function saveDecision(id, mode, status, comment) {
+//     if (mode === 'db') {
+//         await fetch(API + '?action=decide', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ id, status, adminComment: comment })
+//         });
+//     } else {
+//         // localStorage
+//         let arr = JSON.parse(localStorage.getItem('allIdRequests') || '[]');
+//         const idx = arr.findIndex(r => r.trackingNumber === id);
+//         if (idx !== -1) {
+//             arr[idx].status       = status;
+//             arr[idx].adminComment = comment;
+//         }
+//         localStorage.setItem('allIdRequests', JSON.stringify(arr));
+//         // update last
+//         if (arr[0]) localStorage.setItem('lastIdRequest', JSON.stringify(arr[0]));
+//     }
+
+//     // Update local cache immediately
+//     const rec = _allData.find(r => r._id == id);
+//     if (rec) { rec.status = status; rec.adminComment = comment; }
+// }
+
+/* ══════════════════════════════════
+   NAVIGATION
+══════════════════════════════════ */
+function show(name, el) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    el.classList.add('active');
+
+    if (name === 'dashboard') renderDashboard();
+    if (name === 'pending')   renderPending();
+    if (name === 'archives')  renderArchives();
+}
+
+/* ══════════════════════════════════
+   DASHBOARD
+══════════════════════════════════ */
+function renderDashboard() {
+    const total    = _allData.length;
+    const pending  = _allData.filter(r => r.status === 'Pending').length;
+    const approved = _allData.filter(r => r.status === 'Approved').length;
+    const rejected = _allData.filter(r => r.status === 'Rejected').length;
+
+    document.getElementById('sTotal').textContent    = total;
+    document.getElementById('sPending').textContent  = pending;
+    document.getElementById('sApproved').textContent = approved;
+    document.getElementById('sRejected').textContent = rejected;
+    document.getElementById('refreshTime').textContent = 'Refreshed: ' + new Date().toLocaleTimeString();
+
+    const maxV = Math.max(total, 1);
+    document.getElementById('barChart').innerHTML = [
+        { label: 'Total',    val: total,    color: '#3b82f6' },
+        { label: 'Pending',  val: pending,  color: '#f59e0b' },
+        { label: 'Approved', val: approved, color: '#22c55e' },
+        { label: 'Rejected', val: rejected, color: '#ef4444' },
+    ].map(b => `
+        <div class="bar-row">
+            <span class="bar-label">${b.label}</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width:${(b.val/maxV*100).toFixed(1)}%;background:${b.color};"></div>
+            </div>
+            <span class="bar-count">${b.val}</span>
+        </div>`).join('');
+
+    const iconMap = { Approved: '✅', Rejected: '❌', Pending: '⏳' };
+    const recent  = _allData.slice(0, 5);
+    document.getElementById('recentList').innerHTML = recent.length === 0
+        ? '<p style="color:#ccc;text-align:center;padding:20px;font-size:14px;">No activity yet.</p>'
+        : recent.map(r => `
+            <div class="ri">
+                <div class="ri-left">
+                    <span style="font-size:18px;">${iconMap[r.status] || '⏳'}</span>
+                    <div>
+                        <div class="ri-name">${r.fullName || '—'}</div>
+                        <div class="ri-id">${r.trackingNumber}</div>
+                    </div>
+                </div>
+                <span class="badge ${(r.status||'pending').toLowerCase()}">${r.status||'Pending'}</span>
+            </div>`).join('');
+
+    updateBadge();
+}
+
+/* ══════════════════════════════════
+   PENDING
+══════════════════════════════════ */
+function renderPending() {
+    const q       = (document.getElementById('pendingSearch')?.value || '').toLowerCase();
+    let rows      = _allData.filter(r => r.status === 'Pending');
+    if (q) rows   = rows.filter(r =>
+        (r.trackingNumber||'').toLowerCase().includes(q) ||
+        (r.studentId||'').toLowerCase().includes(q) ||
+        (r.fullName||'').toLowerCase().includes(q));
+
+    updateBadge();
+
+    const tbody = document.getElementById('pendingTbody');
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="6">
+            <div class="empty">
+                <i class="fas fa-clipboard-check" style="color:#22c55e;opacity:0.5;"></i>
+                <p>${q ? 'No matching pending requests.' : 'All caught up! No pending requests.'}</p>
+            </div></td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+        <tr>
+            <td>${r.submittedAt || '—'}</td>
+            <td><strong>${r.trackingNumber}</strong></td>
+            <td>${r.studentId}</td>
+            <td>${r.fullName || '—'}</td>
+            <td>${r.requestType || '—'}</td>
+            <td>
+                <button class="btn btn-review" onclick="openModal('${r._id}','${r._mode}')">
+                    <i class="fas fa-eye"></i> Review
+                </button>
+            </td>
+        </tr>`).join('');
+}
+
+function updateBadge() {
+    const cnt   = _allData.filter(r => r.status === 'Pending').length;
+    const badge = document.getElementById('pendingBadge');
+    badge.textContent    = cnt;
+    badge.style.display  = cnt > 0 ? 'inline' : 'none';
+}
+
+/* ══════════════════════════════════
+   ARCHIVES
+══════════════════════════════════ */
+function renderArchives() {
+    const sf   = document.getElementById('archiveStatus').value;
+    const q    = (document.getElementById('archiveSearch')?.value || '').toLowerCase();
+    let rows   = [..._allData];
+    if (sf !== 'all') rows = rows.filter(r => r.status === sf);
+    if (q)            rows = rows.filter(r =>
+        (r.trackingNumber||'').toLowerCase().includes(q) ||
+        (r.studentId||'').toLowerCase().includes(q) ||
+        (r.fullName||'').toLowerCase().includes(q));
+
+    const tbody = document.getElementById('archiveTbody');
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="8">
+            <div class="empty"><i class="fas fa-archive" style="opacity:0.3;"></i><p>No records match.</p></div></td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = rows.map(r => {
+        const sc   = (r.status||'pending').toLowerCase();
+        const note = r.adminComment
+            ? `<span style="color:#b91c1c;font-size:13px;">${r.adminComment}</span>`
+            : `<span style="color:#ccc;">—</span>`;
+        return `<tr>
+            <td>${r.submittedAt || '—'}</td>
+            <td><strong>${r.trackingNumber}</strong></td>
+            <td>${r.studentId}</td>
+            <td>${r.fullName || '—'}</td>
+            <td>${r.requestType || '—'}</td>
+            <td><span class="badge ${sc}">${r.status||'Pending'}</span></td>
+            <td>${note}</td>
+            <td>
+                <button class="btn btn-review" onclick="openModal('${r._id}','${r._mode}')" style="background:#f1f5f9;color:#334155;">
+                    <i class="fas fa-eye"></i> View
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+/* ══════════════════════════════════
+   MODAL
+══════════════════════════════════ */
+function openModal(id, mode) {
+    const r = _allData.find(x => String(x._id) === String(id));
+    if (!r) { alert('Record not found.'); return; }
+
+    _activeId   = id;
+    _activeMode = mode;
+
+    document.getElementById('modalTracking').textContent = r.trackingNumber;
+
+    const fv = v => (v && v !== 'N/A') ? v : '<span style="color:#e53e3e">—</span>';
+    document.getElementById('mName').innerHTML     = fv(r.fullName);
+    document.getElementById('mStudId').innerHTML   = fv(r.studentId);
+    document.getElementById('mDept').innerHTML     = fv(r.department);
+    document.getElementById('mYear').innerHTML     = r.yearLevel ? `Year ${r.yearLevel}` : '—';
+    document.getElementById('mType').innerHTML     = fv(r.requestType);
+    document.getElementById('mStatus2').innerHTML  = fv(r.studentStatus);
+    document.getElementById('mContact').innerHTML  = fv(r.contact);
+    document.getElementById('mBday').innerHTML     = fv(r.birthdate);
+    document.getElementById('mAddr').innerHTML     = fv(r.address);
+    document.getElementById('mEmergency').innerHTML = r.emergencyName
+        ? `${r.emergencyName} | ${r.emergencyContact || '—'} | ${r.emergencyAddress || '—'}`
+        : '—';
+    document.getElementById('mReason').innerHTML   = fv(r.reason);
+
+    // Photo
+    const pd = document.getElementById('photoDisplay');
+    if (r.photo && r.photo.startsWith('data:')) {
+        pd.innerHTML = `<img src="${r.photo}" alt="Student Photo">`;
+    } else {
+        pd.innerHTML = `<div class="no-photo"><i class="fas fa-user-graduate"></i></div>`;
+    }
+
+    // Signature
+    const sb = document.getElementById('sigBox');
+    const sl = document.getElementById('sigLabel');
+    if (r.signature && r.signature.startsWith('data:')) {
+        sb.innerHTML = `<img src="${r.signature}" alt="Signature">`;
+        sl.textContent = 'Signature';
+    } else {
+        sb.innerHTML = '';
+        sl.textContent = '';
+    }
+
+    // Reject section reset
+    document.getElementById('rejectSection').style.display = 'none';
+    document.getElementById('rejectComment').value = '';
+    setFooterDefault(r.status);
+
+    document.getElementById('reviewModal').classList.add('open');
+}
+
+function setFooterDefault(currentStatus) {
+    const foot = document.getElementById('modalFoot');
+    if (currentStatus === 'Pending' || !currentStatus) {
+        foot.innerHTML = `
+            <button class="btn btn-reject" onclick="startReject()"><i class="fas fa-times"></i> Reject</button>
+            <button class="btn btn-approve" onclick="decide('Approved','')"><i class="fas fa-check"></i> Approve</button>`;
+    } else {
+        foot.innerHTML = `<span style="font-size:13px;color:#888;">This request has already been processed.</span>`;
+    }
+}
+
+function startReject() {
+    document.getElementById('rejectSection').style.display = 'block';
+    document.getElementById('rejectComment').focus();
+    document.getElementById('modalFoot').innerHTML = `
+        <button class="btn btn-reset" onclick="cancelReject()"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-reject" onclick="confirmReject()"><i class="fas fa-times-circle"></i> Confirm Rejection</button>`;
+}
+
+function cancelReject() {
+    document.getElementById('rejectSection').style.display = 'none';
+    document.getElementById('rejectComment').value = '';
+    const r = _allData.find(x => String(x._id) === String(_activeId));
+    setFooterDefault(r?.status);
+}
+
+async function confirmReject() {
+    const comment = document.getElementById('rejectComment').value.trim();
+    if (!comment) {
+        document.getElementById('rejectComment').style.borderColor = '#b91c1c';
+        document.getElementById('rejectComment').focus();
+        return;
+    }
+    await decide('Rejected', comment);
+}
+
+async function decide(status, comment) {
+    document.getElementById('modalFoot').innerHTML = '<span class="spinner"></span> Saving…';
+    await saveDecision(_activeId, _activeMode, status, comment);
+    closeModal();
+    renderDashboard();
+    renderPending();
+    renderArchives();
+    alert(`Request marked as ${status}!`);
+}
+
+function closeModal() {
+    document.getElementById('reviewModal').classList.remove('open');
+}
+function maybeClose(e) {
+    if (e.target === document.getElementById('reviewModal')) closeModal();
+}
+
+/* ══════════════════════════════════
+   LOGOUT
+══════════════════════════════════ */
+async function logout() {
+    try { await fetch('../api/auth.php?action=logout', { method: 'POST' }); } catch (_) {}
+    sessionStorage.removeItem('adminName');
+    window.location.href = 'adminLogin.html';
+}
+
+/* Auto-refresh data every 30s when on dashboard */
+setInterval(async () => {
+    if (document.getElementById('sec-dashboard').classList.contains('active')) {
+        await loadData();
+        renderDashboard();
+    }
+}, 30000);
+</script>
+</body>
+</html>

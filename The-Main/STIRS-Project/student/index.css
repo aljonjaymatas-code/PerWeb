@@ -1,0 +1,265 @@
+/* Import Font */
+@import url('https://fonts.googleapis.com/css2?family=Jeju+Myeongjo&display=swap');
+
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* MAIN CONTAINER (LEFT + RIGHT) */
+.main-container {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    height: 90vh;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+/* LEFT SIDE (MATCH LOGIN DESIGN) */
+.left {
+    width: 50%;
+    background: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b') no-repeat center/cover;
+    position: relative;
+    color: white;
+}
+
+.left .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(46,125,50,0.7));
+}
+
+.left-content {
+    position: relative;
+    z-index: 2;
+    padding: 50px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.left h1 {
+    font-family: 'Jeju Myeongjo', serif;
+    font-size: 60px;
+    line-height: 1;
+}
+
+.left p {
+    font-size: 16px;
+    opacity: 0.9;
+    max-width: 300px;
+}
+.ID{
+    margin-left: 50px;
+}
+.R {
+    margin-left: 90px;
+}
+.S{
+    margin-left: 100px;
+}
+.T{
+    margin-left: 120px;
+}
+
+/* RIGHT SIDE */
+.right {
+    width: 50%;
+    padding: 50px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.portal-box {
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+}
+
+/* LOGO */
+.logo-container img {
+    width: 110px;
+    margin-bottom: 20px;
+}
+
+/* TITLE */
+.portal-box h2 {
+    color: #2E7D32;
+    margin-bottom: 10px;
+}
+
+.portal-box p {
+    color: #2E7D32;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+/* BUTTON GROUP */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* BUTTON STYLE (MATCH LOGIN GREEN THEME) */
+.button-group button {
+    width: 100%;
+    padding: 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* STUDENT BUTTON */
+.button-group button:first-child {
+    background: #2E7D32;
+    color: white;
+}
+
+.button-group button:first-child:hover {
+    background: #1e5c24;
+}
+
+/* ADMIN BUTTON */
+.button-group button:last-child {
+    background: #f0f8e8;
+    color: #2E7D32;
+    border: 2px solid #2E7D32;
+}
+
+.button-group button:last-child:hover {
+    background: #e0f0d0;
+}
+
+/* ================= MODAL (KEEPED + IMPROVED) ================= */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: #ffffff;
+    width: 90%;
+    max-width: 520px;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* SCROLLABLE CONTENT */
+.modal-content {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.modal-content p {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+/* FOOTER */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+/* AGREE BUTTON */
+.agree-btn {
+    background: #2E7D32;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.agree-btn:hover {
+    background: #1e5c24;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+        height: auto;
+        border-radius: 0;
+    }
+
+    .left, .right {
+        width: 100%;
+    }
+
+    .left {
+        height: 250px;
+    }
+
+    .right {
+        padding: 40px 20px;
+    }
+}
+.socials {
+    display: flex;
+    gap: 15px;
+}
+
+.socials i {
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.socials i:hover {
+    transform: translateY(-3px);
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(46,125,50,0.7));
+}
+
+.reminder {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #856404;
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 10px;
+    padding: 10px 15px;
+    text-align: center;
+}

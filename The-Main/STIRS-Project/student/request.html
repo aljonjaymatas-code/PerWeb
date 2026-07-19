@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STIRS – Track Request</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --green: #1B5E20; --mid: #2E7D32; --lt: #E8F5E9; --err: #D32F2F; }
+        body { font-family: 'DM Sans', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-top {
+            background: var(--green);
+            padding: 28px 30px 24px;
+            text-align: center;
+            color: white;
+        }
+        .card-top img { height: 52px; margin-bottom: 12px; }
+        .card-top h1 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 6px; }
+        .card-top p { font-size: 14px; opacity: 0.8; }
+
+        .card-body { padding: 32px 30px; }
+
+        .fg { margin-bottom: 20px; }
+        .fg label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #555; margin-bottom: 7px; }
+        .fg input {
+            width: 100%; padding: 13px 16px;
+            border: 1.5px solid #dde3ec; border-radius: 12px;
+            font-size: 15px; font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s; color: #333;
+        }
+        .fg input:focus { outline: none; border-color: var(--mid); box-shadow: 0 0 0 3px rgba(46,125,50,0.12); }
+
+        .track-btn {
+            width: 100%; padding: 15px;
+            background: var(--mid); color: white;
+            border: none; border-radius: 12px;
+            font-size: 15.5px; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 5px 18px rgba(46,125,50,0.25);
+        }
+        .track-btn:hover { background: var(--green); transform: translateY(-1px); }
+
+        .back-link { display: flex; align-items: center; gap: 7px; color: var(--mid); text-decoration: none; font-size: 14px; font-weight: 600; margin-top: 14px; justify-content: center; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* RESULT */
+        #result { display: none; margin-top: 28px; }
+        .result-card {
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+        }
+        .result-card.pending  { background: #fffbeb; border-left: 5px solid #f59e0b; }
+        .result-card.approved { background: #f0fdf4; border-left: 5px solid #22c55e; }
+        .result-card.rejected { background: #fff5f5; border-left: 5px solid var(--err); }
+
+        .r-icon { font-size: 36px; flex-shrink: 0; }
+        .r-details p { font-size: 14px; color: #444; margin-bottom: 8px; line-height: 1.5; }
+        .r-details strong { color: #222; }
+        .status-pill {
+            display: inline-block; padding: 4px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .status-pill.pending  { background: #fef3c7; color: #92400e; }
+        .status-pill.approved { background: #dcfce7; color: #166534; }
+        .status-pill.rejected { background: #fee2e2; color: #991b1b; }
+
+        .rejection-box {
+            margin-top: 12px; padding: 12px 14px;
+            background: #fff5f5; border-left: 4px solid var(--err);
+            border-radius: 8px; font-size: 13.5px; color: #444; line-height: 1.6;
+        }
+        .rejection-box strong { color: var(--err); display: block; margin-bottom: 4px; }
+
+        .again-btn {
+            width: 100%; padding: 12px; background: white;
+            border: 1.5px solid #dde3ec; border-radius: 10px;
+            cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif;
+            margin-top: 16px; color: #555; transition: all 0.2s;
+        }
+        .again-btn:hover { border-color: var(--mid); color: var(--mid); }
+
+        .footer-hint { text-align: center; font-size: 13px; color: #999; margin-top: 20px; }
+        .footer-hint a { color: var(--mid); font-weight: 600; text-decoration: none; }
+
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-top">
+        <img src="photo/acespicture-modified (1).png" alt="Logo" onerror="this.style.display='none'">
+        <h1>Track Your Request</h1>
+        <p>Enter your tracking number and student ID to check status</p>
+    </div>
+    <div class="card-body">
+        <form id="trackForm">
+            <div class="fg">
+                <label>Tracking Number <span style="color:#e74c3c;">*</span></label>
+                <input type="text" id="trackingNum" placeholder="e.g. REQ-2026-12345" required>
+            </div>
+            <div class="fg">
+                <label>Student ID Number <span style="color:#e74c3c;">*</span></label>
+                <input type="text" id="studentId" placeholder="e.g. 140123" required>
+            </div>
+            <button type="submit" class="track-btn" id="trackBtn">
+                <i class="fas fa-search"></i> Check Status
+            </button>
+        </form>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+        <!-- RESULT -->
+        <div id="result">
+            <div id="resultCard" class="result-card pending">
+                <div id="rIcon" class="r-icon">⏳</div>
+                <div id="rDetails" class="r-details"></div>
+            </div>
+            <button class="again-btn" onclick="resetForm()">
+                <i class="fas fa-search"></i> Check Another Request
+            </button>
+        </div>
+
+        <div class="footer-hint">
+            Don't have a tracking number? <a href="requestForm.html">Submit a request</a>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = '../api/requests.php';
+
+// Pre-fill from last submission
+window.addEventListener('load', () => {
+    const tn = localStorage.getItem('lastTracking');
+    const si = localStorage.getItem('lastStudentId');
+    if (tn) document.getElementById('trackingNum').value = tn;
+    if (si) document.getElementById('studentId').value   = si;
+});
+
+document.getElementById('trackForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const tn  = document.getElementById('trackingNum').value.trim();
+    const sid = document.getElementById('studentId').value.trim();
+    if (!tn || !sid) { alert('Please fill in both fields.'); return; }
+
+    const btn = document.getElementById('trackBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Checking…';
+
+    let found = null;
+
+    // Try PHP API first
+    try {
+        const res  = await fetch(`${API}?action=track&trackingNumber=${encodeURIComponent(tn)}&studentId=${encodeURIComponent(sid)}`);
+        const text = await res.text();
+        console.log("RAW RESPONSE:", text);
+        const data = JSON.parse(text);
+        if (data && (data.found === true || data.tracking_number)) {
+            found = data;
+        }
+    } catch (_) { /* PHP not running, fall through */ }
+
+    // Fallback: localStorage
+    if (!found) {
+        const all = JSON.parse(localStorage.getItem('allIdRequests') || '[]');
+        const match = all.find(r => r.trackingNumber === tn && r.studentId === sid);
+        if (match) {
+            found = {
+                found:          true,
+                tracking_number: match.trackingNumber,
+                student_id:      match.studentId,
+                full_name:       match.fullName,
+                department:      match.department,
+                request_type:    match.requestType,
+                status:          match.status || 'Pending',
+                admin_comment:   match.adminComment || '',
+                submitted_at:    match.submittedAt,
+            };
+        }
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-search"></i> Check Status';
+
+    if (!found) {
+        alert('No request found matching those details. Please check your tracking number and student ID.');
+        return;
+    }
+
+    showResult(found);
+});
+
+function showResult(r) {
+    const sc   = (r.status || 'Pending').toLowerCase();
+    const card = document.getElementById('resultCard');
+    card.className = 'result-card ' + sc;
+
+    const icons = { pending: '⏳', approved: '✅', rejected: '❌' };
+    document.getElementById('rIcon').textContent = icons[sc] || '⏳';
+
+    let html = `
+        <p><strong>Tracking Number:</strong> ${r.tracking_number}</p>
+        <p><strong>Student ID:</strong> ${r.student_id}</p>
+        <p><strong>Name:</strong> ${r.full_name || '—'}</p>
+        <p><strong>Request Type:</strong> ${r.request_type || '—'}</p>
+        <p><strong>Status:</strong> <span class="status-pill ${sc}">${r.status || 'Pending'}</span></p>
+        <p><strong>Submitted:</strong> ${r.submitted_at || '—'}</p>`;
+
+    if (sc === 'approved') {
+        html += `<p style="color:#166534;margin-top:8px;"><i class="fas fa-check-circle"></i> Your request has been approved! Visit the registrar's office to claim your ID.</p>`;
+    } else if (sc === 'rejected') {
+        const reason = r.admin_comment || 'No specific reason provided.';
+        html += `<div class="rejection-box">
+                    <strong><i class="fas fa-exclamation-circle"></i> Reason for Rejection</strong>
+                    ${reason}
+                 </div>
+                 <p style="margin-top:10px;font-size:13px;color:#666;">Please correct the issue and resubmit, or contact the registrar's office.</p>`;
+    } else {
+        html += `<p style="color:#92400e;margin-top:8px;"><i class="fas fa-info-circle"></i> Your request is under review. Please check back later.</p>`;
+    }
+
+    document.getElementById('rDetails').innerHTML = html;
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetForm() {
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('trackingNum').value = '';
+    document.getElementById('studentId').value   = '';
+    document.getElementById('trackingNum').focus();
+}
+</script>
+</body>
+</html>
