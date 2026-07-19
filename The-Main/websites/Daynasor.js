@@ -36,11 +36,11 @@
   }
 
   // Background
-  const bgImg = new Image(); bgImg.src = "forest.png"; 
+  const bgImg = new Image(); bgImg.src = "../pictures/forest.png"; 
   let bgX = 0;
 
   // Dino
-  const dinoImg = new Image(); dinoImg.src = "Dinoo.png";
+  const dinoImg = new Image(); dinoImg.src = "../pictures/Dinoo.png";
   const dino = {
     x: 50, y: groundY - 60, w: 60, h: 60,
     vy: 0, jumping: false,
@@ -85,7 +85,7 @@
   // Obstacles
 let obstacles = [], spawnTimer = 0;
 const obstacleImg = new Image();
-obstacleImg.src = "spider.png"; // <-- replace with your generated image file name
+obstacleImg.src = "../pictures/spider.png"; // <-- replace with your generated image file name
 
 function spawnObstacle() {
   const w = 30; // obstacle width
