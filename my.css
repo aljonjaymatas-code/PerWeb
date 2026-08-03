@@ -310,6 +310,58 @@ canvas {
   box-shadow: 0 6px 25px rgba(79, 195, 247, 0.6);
 }
 
+/* ================== Skills Section (project-style) ================== */
+.skills-section {
+  background: rgba(0, 31, 63, 0.6);
+  border: 2px solid rgba(79, 195, 247, 0.5);
+  border-radius: 20px;
+  padding: 60px 20px;
+  margin: 40px auto;
+  max-width: 1000px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  color: #f5f5f5;
+}
+.skills-section .container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 20px;
+}
+.skill-card {
+  width: 100%;
+  background: rgba(0, 31, 63, 0.6);
+  border: 2px solid rgba(79, 195, 247, 0.5);
+  border-radius: 15px;
+  text-align: center;
+  padding: 20px;
+  color: #f5f5f5;
+  box-shadow: 0 4px 20px rgba(79, 195, 247, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.skill-card h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+.skill-card p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+@media (max-width: 900px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ================== Albums Section ================== */
 .albums-section {
   background: rgba(0, 31, 63, 0.6);
